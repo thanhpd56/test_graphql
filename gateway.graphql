@@ -1,0 +1,178 @@
+# Root Query
+type Query {
+    articles: [Article]!
+    article(id: ID!): Article
+    getStaffByID(id: ID!): Staff
+    getMe: Me,
+    role(id: ID!): Role
+    roles(filters: ListRolesFilters, pagination: PaginationRequest): ListRolesResponse
+    permissions(filters: ListPermissionsFilters): [Permission]
+}
+
+# Root Mutation
+type Mutation {
+    deleteArticle(id: ID!): Boolean!
+    login(loginRequest: LoginRequest!): LoginResponse!
+    createRole(role: CreateRoleRequest!): Role
+    updateRole(id: ID!, role: UpdateRoleRequest!): Role
+    uploadImage(file: Upload!): ImageType!
+}
+
+# Custom Scalar Types
+scalar Timestamp
+scalar Uint
+scalar Uint64
+scalar Uint32
+scalar Int64
+scalar Int32
+scalar Upload
+
+# Types
+
+# pagination types
+input PaginationRequest {
+    offset: Int64
+    limit: Int64
+}
+
+type PaginationData {
+    total: Int64
+    offset: Int64
+    limit: Int64
+}
+
+type ImageType {
+    path: String!
+    origin: String!
+    thumbnail: String!
+}
+
+
+type Me {
+    id: ID!
+    fullname: String!
+    email: String!
+    telephone: String
+    address: String
+    warehouse: Warehouse!
+    department: Department!
+    createdAt: Timestamp!
+    updatedAt: Timestamp!
+}
+
+type Article {
+    id: ID!
+    title: String!
+    description: String!
+    content: String!
+    createdAt: Timestamp!
+    updatedAt: Timestamp!
+}
+
+type Department {
+    id: ID!
+    code: String!
+    name: String!
+    description: String
+    createdAt: Timestamp!
+}
+
+type Warehouse {
+    id: ID!
+    code: String!
+    name: String!
+    description: String
+    createdAt: Timestamp!
+}
+
+type Staff {
+    id: ID!
+    fullname: String!
+    email: String!
+    telephone: String
+    address: String
+    department: Department
+    createdAt: Timestamp!
+    updatedAt: Timestamp!
+}
+
+
+input LoginRequest {
+    email: String!
+    password: String!
+}
+
+type LoginResponse {
+    accessToken: String!
+}
+
+# single role object
+type Role {
+    id: ID!
+    code: String!
+    name: String!
+    description: String
+    createdAt: Timestamp!
+    updatedAt: Timestamp!
+    # selected permissions
+    permissions:[Permission]
+    # selected permissions with checked
+    fullPermissions: [PermissionWithChecked]
+}
+
+enum RoleFilterOrderBy{
+    id_ASC
+    id_DESC
+    name_ASC
+    name_DESC
+}
+
+input ListRolesFilters {
+    query: String
+    ids: [Int64]
+    orderBy: RoleFilterOrderBy
+}
+
+type ListRolesResponse{
+    roles:[Role]!
+    paginationData: PaginationData!
+}
+
+input CreateRoleRequest {
+    code: String!
+    name: String!
+    description: String,
+    permissions: [ID!]
+}
+
+input UpdateRoleRequest {
+    name: String!
+    description: String
+    permissions: [ID!]
+}
+
+type RolePermission {
+    roleId: ID!
+    permissionId: ID!
+}
+
+input ListPermissionsFilters {
+    ids: [Int64]
+}
+
+type Permission {
+    id: ID!
+    code: String!
+    name: String!
+    parentId: ID
+    level: Int32!
+}
+
+type PermissionWithChecked {
+    id: ID!
+    code: String!
+    name: String!
+    parentId: ID
+    level: Int32!
+    isChecked: Boolean!
+}
